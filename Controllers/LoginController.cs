@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TTDAttendancePortal_backend.Data;
 using TTDAttendancePortal_backend.Models.Dto;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace TTDAttendancePortal_backend.Controllers
 {
@@ -23,9 +25,9 @@ namespace TTDAttendancePortal_backend.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult LoginUser(LoginDto loginDto)
+        public async Task<IActionResult> LoginUser(LoginDto loginDto)
         {
-            var user = dbContext.Users.FirstOrDefault(x => x.Email == loginDto.Email);
+            var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
             if (user != null)
             {
