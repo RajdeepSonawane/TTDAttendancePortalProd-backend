@@ -1,0 +1,21 @@
+# Use official .NET 8 SDK image to build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /app
+
+# Copy csproj and restore
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy all source and publish
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+# Use runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /app/out .
+
+# Use port from environment (Render sets PORT env variable)
+ENV ASPNETCORE_URLS=http://+:$PORT
+
+ENTRYPOINT ["dotnet", "TTDAttendancePortalProd-backend.dll"]
