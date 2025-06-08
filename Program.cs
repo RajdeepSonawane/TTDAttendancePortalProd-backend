@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://ttdattendanceportalprod-frontend.onrender.com")
+        policy.WithOrigins("https://ttdattendanceportalprod-frontend.onrender.com/api")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
