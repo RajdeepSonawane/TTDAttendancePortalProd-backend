@@ -98,7 +98,7 @@ namespace TTDAttendancePortal_backend.Controllers
 
             int UserId = int.Parse(userIdClaim.Value);
 
-            DateTime checkOutDate = DateTime.Now;
+            var checkOutDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
             var attendance = dbContext.Attendance
                                 .Where(a => a.UserId == UserId && a.CheckOutDate == null)
