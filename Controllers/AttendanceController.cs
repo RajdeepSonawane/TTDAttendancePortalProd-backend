@@ -48,7 +48,11 @@ namespace TTDAttendancePortal_backend.Controllers
             int UserId = int.Parse(userIdClaim.Value);
 
 
-            var currentDate = DateTime.Today;
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+            var currentDate = istNow.Date;
+
+            var checkInDate= TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
             var alreadyCheckedInToday = dbContext.Attendance
             .Any(a => a.UserId == UserId && a.CheckInDate.HasValue && a.CheckInDate.Value.Date == currentDate);
@@ -63,7 +67,7 @@ namespace TTDAttendancePortal_backend.Controllers
             var attendanceEntity = new Attendance()
             {
                 UserId = UserId,
-                CheckInDate = DateTime.Now,
+                CheckInDate = checkInDate,
                 CheckInLocation = checkInDto.CheckInLocation,
                 CheckInOtherLocation = checkInDto.CheckInLocation == 1 ? checkInDto.CheckInOtherLocation : null,
                 CheckOutDate = null,
