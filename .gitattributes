@@ -3,6 +3,9 @@
 ###############################################################################
 * text=auto
 appsettings.json merge=ours
+*.sln merge=ours
+*.csproj merge=ours
+
 
 ###############################################################################
 # Set default behavior for command prompt diff.
