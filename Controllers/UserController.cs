@@ -30,6 +30,23 @@ namespace TTDAttendancePortal_backend.Controllers
             return Ok(user);
         }
 
+
+        //[Authorize(Roles = "Super Admin")]
+        [HttpGet("user-name")]
+        public IActionResult GetUsersname()
+        {
+            var rawData = dbContext.Users.ToList();
+
+            var users = rawData.Select(u => new UserNameDto
+            {
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+            }).ToList();
+
+
+            return Ok(users);
+        }
+
         //[Authorize(Roles = "Super Admin")]
         [HttpGet("user-list")]
         public IActionResult GetUsers()
