@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TTDAttendancePortal_backend.Data;
 using TTDAttendancePortal_backend.Models.Dto;
 using TTDAttendancePortal_backend.Models.Entities;
@@ -33,6 +34,51 @@ namespace TTDAttendancePortal_backend.Controllers
             return Ok(attendance);
         }
 
+        [Authorize]
+        [HttpPost("attendance-view")]
+        public IActionResult AttendanceList(AttendanceRequestDto attendanceRequestDto)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("Id");
+            var roleClaim = HttpContext.User.FindFirst("Role");
+            if (userIdClaim == null || roleClaim == null)
+                return Unauthorized("User ID or Role not found in token");
+
+            int Id = int.Parse(userIdClaim.Value);
+            string role = roleClaim.Value;
+
+            var query = dbContext.Attendance
+                .Include(a => a.User)
+                .Include(a => a.CheckInLocationNav)
+                .Include(a => a.CheckOutLocationNav)
+                .Where(a => a.CheckInDate >= attendanceRequestDto.fromDate &&
+                            a.CheckInDate <= attendanceRequestDto.toDate);
+
+            if (role != "Super Admin")
+                query = query.Where(a => a.UserId == Id);
+
+            var rawData = query.ToList();
+
+
+
+            var attendance = rawData.Select(a => new AttendanceResponseDto
+            {
+                EmployeeCode = a.User?.EmployeeCode ?? "",
+                FirstName = a.User?.FirstName ?? "",
+                LastName = a.User?.LastName ?? "",
+                InDate = a.CheckInDate ?? DateTime.MinValue,
+                InTime = (a.CheckInDate ?? DateTime.MinValue).ToString("hh:mmtt"),
+                InLocation = a.CheckInLocationNav?.Name ?? a.CheckInOtherLocation ?? "",
+                OutTime = (a.CheckOutDate ?? DateTime.MinValue).ToString("hh:mmtt"),
+                OutLocation = a.CheckOutLocationNav?.Name ?? a.CheckOutOtherLocation ?? "",
+                Status = a.Status ?? "",
+                Activity = a.Activity ?? "",
+                HoursWorked = a.HoursWorked ?? TimeSpan.Zero
+            }).ToList();
+
+
+            return Ok(attendance);
+
+        }
 
         [Authorize]
         [HttpPost("check-in")]
